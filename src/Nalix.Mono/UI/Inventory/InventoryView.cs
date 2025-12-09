@@ -40,9 +40,7 @@ public sealed class InventoryView
     public InventoryView(
         InventoryGrid inventory, SpriteBatch spriteBatch,
         Texture2D slotBackgroundTexture, SpriteFont font,
-        IReadOnlyDictionary<System.String, Texture2D> iconMap, System.Int32 slotSize = 40,
-        System.Int32 slotPadding = 4, Texture2D panelBackgroundTexture = null,
-        System.Int32 panelPadding = 24, System.Single panelWidthPercent = 0.45f, System.Single panelHeightPercent = 0.4f)
+        IReadOnlyDictionary<System.String, Texture2D> iconMap, Texture2D panelBackgroundTexture = null)
     {
         if (inventory == null)
         {
@@ -73,13 +71,14 @@ public sealed class InventoryView
         {
             this._panelBackground = new NineSliceTexture(panelBackgroundTexture);
         }
-        this._layout = new InventoryLayout(inventory.Rows, inventory.Columns, slotSize, slotPadding, panelPadding, panelWidthPercent, panelHeightPercent);
+        this._layout = new InventoryLayout(inventory.Rows, inventory.Columns);
         this._interaction = new InventoryActions(inventory);
     }
 
     public void CenterOnScreen(System.Int32 screenWidth, System.Int32 screenHeight)
     {
-        this._layout.Recalculate(screenWidth, screenHeight);
+        _layout.Recalculate(screenWidth, screenHeight);
+        RecalculateCharacterLayout();
     }
 
     public void Update(GameTime gameTime, MouseState mouseState)
@@ -135,7 +134,7 @@ public sealed class InventoryView
                 }
                 if (this._hoveredSlot.X == row && this._hoveredSlot.Y == col)
                 {
-                    Color hoverColor = new(230, 245, 255, 70);
+                    Color hoverColor = new(230, 245, 255, 90);
                     this._spriteBatch.Draw(this._slotBackgroundTexture, slotRect, hoverColor);
                 }
                 if (stack != null)
@@ -158,6 +157,7 @@ public sealed class InventoryView
                 }
             }
         }
+
         this.DrawCursorStack();
     }
 
@@ -210,10 +210,11 @@ public sealed class InventoryView
         }
         System.Int32 slotSize = this._layout.SlotSize;
         Point mouse = this._lastMousePosition;
-        Rectangle cursorRect = new(mouse.X - (slotSize / 2), mouse.Y - (slotSize / 2), slotSize, slotSize);
+        Rectangle cursorRect = new(mouse.X - (slotSize / 2), mouse.Y - ((slotSize / 2) - 4), slotSize, slotSize);
         Texture2D iconTexture;
         if (this._iconMap.TryGetValue(cursorStack.Definition.IconKey, out iconTexture))
         {
+            this._spriteBatch.Draw(iconTexture, cursorRect, new Color(0, 0, 0, 120));
             this._spriteBatch.Draw(iconTexture, cursorRect, Color.White);
         }
         if (cursorStack.Quantity > 1)
@@ -222,6 +223,37 @@ public sealed class InventoryView
             Vector2 textSize = this._font.MeasureString(text);
             Vector2 textPos = new(cursorRect.Right - textSize.X, cursorRect.Bottom - textSize.Y);
             this._spriteBatch.DrawString(this._font, text, textPos, Color.White);
+        }
+    }
+
+    private void RecalculateCharacterLayout()
+    {
+        var panelRect = _layout.PanelRect;
+        System.Int32 slotSize = _layout.SlotSize;
+
+        const System.Int32 margin = 10;           // khoảng cách từ viền panel
+        const System.Int32 gap = 4;               // khoảng cách giữa các slot giáp
+
+        // Khung nhân vật (2x3 slot size, bạn chỉnh theo ý thích)
+        _characterRect = new Rectangle(
+            panelRect.X + margin + slotSize,  // đẩy sang phải 1 slot để còn chỗ cho cột giáp
+            panelRect.Y + margin,
+            slotSize * 2,
+            slotSize * 3
+        );
+
+        // 4 ô giáp xếp dọc, bên trái khung nhân vật
+        System.Int32 armorX = panelRect.X + margin;
+        System.Int32 armorY = _characterRect.Y;
+
+        for (System.Int32 i = 0; i < _armorSlotRects.Length; i++)
+        {
+            _armorSlotRects[i] = new Rectangle(
+                armorX,
+                armorY + (i * (slotSize + gap)),
+                slotSize,
+                slotSize
+            );
         }
     }
 
@@ -247,4 +279,7 @@ public sealed class InventoryView
     private MouseState _previousMouseState;
 
     private Point _lastMousePosition;
+
+    private Rectangle _characterRect;
+    private readonly Rectangle[] _armorSlotRects = new Rectangle[4];
 }

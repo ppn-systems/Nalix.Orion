@@ -46,7 +46,7 @@ public class GameHost : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         _slotTexture = Content.Load<Texture2D>("ui/panels/015");
-        var panelTex = Content.Load<Texture2D>("ui/panels/004");
+        Texture2D panelTex = Content.Load<Texture2D>("ui/panels/004");
         _font = Content.Load<SpriteFont>("fonts/1");
 
         _iconMap = new Dictionary<System.String, Texture2D>
@@ -57,7 +57,7 @@ public class GameHost : Game
 
         _inventory = new InventoryGrid(rows: 4, columns: 9);
         ItemDefinition appleDef = new("433", "Apple", "item.rada1");
-        ItemDefinition appleDef2 = new("433", "Apple", "item.rada4");
+        ItemDefinition appleDef2 = new("433", "Apple", "item.rada4", rarity: ItemRarity.Epic);
         _inventory.SetSlot(0, 0, new ItemStack(appleDef, 64));
         _inventory.SetSlot(0, 1, new ItemStack(appleDef2, 14));
 
@@ -67,14 +67,9 @@ public class GameHost : Game
             _slotTexture,
             _font,
             _iconMap,
-            slotSize: 40,
-            slotPadding: 4,
-            panelBackgroundTexture: panelTex,
-            panelPadding: 24);
+            panelBackgroundTexture: panelTex);
 
-        _inventoryView.CenterOnScreen(
-            GraphicsDevice.Viewport.Width,
-            GraphicsDevice.Viewport.Height);
+        _inventoryView.CenterOnScreen(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
     }
 
     protected override void Update(GameTime gameTime)

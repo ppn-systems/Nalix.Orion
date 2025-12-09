@@ -13,29 +13,23 @@ public sealed class InventoryLayout
     public Vector2 GridPosition { get; private set; }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "<Pending>")]
-    public InventoryLayout(
-        System.Int32 rows, System.Int32 columns,
-        System.Int32 slotSize, System.Int32 slotPadding,
-        System.Int32 panelPadding, System.Single panelWidthPercent, System.Single panelHeightPercent)
+    public InventoryLayout(System.Int32 rows, System.Int32 columns)
     {
         this._rows = rows;
         this._columns = columns;
-        this.SlotSize = slotSize;
-        this.SlotPadding = slotPadding;
-        this._panelPadding = panelPadding;
-        this._panelWidthPercent = panelWidthPercent;
-        this._panelHeightPercent = panelHeightPercent;
+        this.SlotSize = 30;
+        this.SlotPadding = 4;
     }
 
     public void Recalculate(System.Int32 screenWidth, System.Int32 screenHeight)
     {
-        System.Int32 panelWidth = (System.Int32)(screenWidth * this._panelWidthPercent);
-        System.Int32 panelHeight = (System.Int32)(screenHeight * this._panelHeightPercent);
+        System.Int32 panelWidth = (System.Int32)(screenWidth * PanelWidthPercent) + BottomExtraPadding;
+        System.Int32 panelHeight = (System.Int32)(screenHeight * PanelHeightPercent) + (BottomExtraPadding * 2);
         System.Int32 panelX = (screenWidth - panelWidth) / 2;
         System.Int32 panelY = (screenHeight - panelHeight) / 2;
         this.PanelRect = new Rectangle(panelX, panelY, panelWidth, panelHeight);
-        System.Single num = panelWidth - (this._panelPadding * 2);
-        System.Int32 innerHeight = panelHeight - (this._panelPadding * 2);
+        System.Single num = panelWidth - (PanelPadding * 2);
+        System.Int32 innerHeight = panelHeight - (PanelPadding * 2);
         System.Single slotWidthF = (num - ((this._columns - 1) * this.SlotPadding)) / _columns;
         System.Single slotHeightF = (innerHeight - ((this._rows - 1) * this.SlotPadding)) / (System.Single)this._rows;
         this.SlotSize = (System.Int32)System.Math.Floor((System.Double)System.Math.Min(slotWidthF, slotHeightF));
@@ -60,6 +54,12 @@ public sealed class InventoryLayout
     {
         System.Int32 num = (System.Int32)(this.GridPosition.X + (column * (this.SlotSize + this.SlotPadding)));
         System.Single y = this.GridPosition.Y + (row * (this.SlotSize + this.SlotPadding));
+
+        if (row == _rows - 1) // hàng cuối
+        {
+            y += BottomExtraPadding;
+        }
+
         return new Rectangle(num, (System.Int32)y, this.SlotSize, this.SlotSize);
     }
 
@@ -82,9 +82,9 @@ public sealed class InventoryLayout
 
     private readonly System.Int32 _columns;
 
-    private readonly System.Int32 _panelPadding;
+    private const System.Int32 PanelPadding = 24;
+    private const System.Int32 BottomExtraPadding = 12;
+    private const System.Single PanelWidthPercent = 0.45f;
+    private const System.Single PanelHeightPercent = 0.40f;
 
-    private readonly System.Single _panelWidthPercent;
-
-    private readonly System.Single _panelHeightPercent;
 }
