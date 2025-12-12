@@ -20,7 +20,7 @@ internal static class Program
 
             TerminalService terminal = new(consoleReader, shortcuts, AppConfig.Listener);
 
-            host.AddService(terminal);
+            _ = host.AddService(terminal);
 
             await host.ActivateAsync().ConfigureAwait(false);
 
