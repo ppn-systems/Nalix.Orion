@@ -5,7 +5,7 @@ using Nalix.Common.Packets.Attributes;
 using Nalix.Common.Protocols;
 using Nalix.Framework.Injection;
 using Nalix.Logging;
-using Nalix.Network.Connection;
+using Nalix.Network.Connections;
 using Nalix.Protocol.Enums;
 using Nalix.Shared.Memory.Pooling;
 using Nalix.Shared.Messaging.Controls;
@@ -41,7 +41,7 @@ public sealed class HandshakeOps
     /// <param name="connection">Thông tin kết nối của client yêu cầu bắt tay bảo mật.</param>
     /// <returns>Gói tin chứa khóa công khai của server hoặc thông báo lỗi nếu quá trình thất bại.</returns>
     [PacketEncryption(false)]
-    [PacketPermission(PermissionLevel.None)]
+    [PacketPermission(PermissionLevel.NONE)]
     [PacketOpcode((System.UInt16)OpCommand.HANDSHAKE)]
     [System.Runtime.CompilerServices.MethodImpl(
         System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -53,8 +53,8 @@ public sealed class HandshakeOps
         {
             await connection.SendAsync(
                 ControlType.ERROR,
-                ProtocolCode.UNSUPPORTED_PACKET,
-                ProtocolAction.DO_NOT_RETRY).ConfigureAwait(false);
+                ProtocolReason.UNSUPPORTED_PACKET,
+                ProtocolAdvice.DO_NOT_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Error(
                 "Invalid packet type. Expected HandshakePacket from {0}", connection.RemoteEndPoint);
@@ -67,8 +67,8 @@ public sealed class HandshakeOps
         {
             await connection.SendAsync(
                 ControlType.ERROR,
-                ProtocolCode.MISSING_REQUIRED_FIELD,
-                ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+                ProtocolReason.MISSING_REQUIRED_FIELD,
+                ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Error(
                 "Null payload in handshake packet from {0}", connection.RemoteEndPoint);
@@ -81,8 +81,8 @@ public sealed class HandshakeOps
         {
             await connection.SendAsync(
                 ControlType.ERROR,
-                ProtocolCode.VALIDATION_FAILED,
-                ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+                ProtocolReason.VALIDATION_FAILED,
+                ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Invalid public key length [Length={0}] from {1}", packet.Data.Length, connection.RemoteEndPoint);
@@ -111,7 +111,7 @@ public sealed class HandshakeOps
             System.Array.Clear(secret, 0, secret.Length);
 
             // Nâng cấp quyền truy cập của client lên mức Guest
-            connection.Level = PermissionLevel.Guest;
+            connection.Level = PermissionLevel.GUEST;
 
             response.Initialize(keyPair.PublicKey);
             response.OpCode = (System.UInt16)OpCommand.HANDSHAKE;
@@ -127,12 +127,12 @@ public sealed class HandshakeOps
 
             // Reset connection state nếu có lỗi
             connection.Secret = null;
-            connection.Level = PermissionLevel.None;
+            connection.Level = PermissionLevel.NONE;
 
             await connection.SendAsync(
                 ControlType.ERROR,
-                ProtocolCode.INTERNAL_ERROR,
-                ProtocolAction.BACKOFF_RETRY,
+                ProtocolReason.INTERNAL_ERROR,
+                ProtocolAdvice.BACKOFF_RETRY,
                 flags: ControlFlags.IS_TRANSIENT).ConfigureAwait(false);
         }
         finally
@@ -148,7 +148,7 @@ public sealed class HandshakeOps
             if (!sent)
             {
                 connection.Secret = null;
-                connection.Level = PermissionLevel.Guest;
+                connection.Level = PermissionLevel.GUEST;
                 NLogix.Host.Instance.Warn("HANDSHAKE send failed; rolled back state for {0}", connection.RemoteEndPoint);
                 return;
             }

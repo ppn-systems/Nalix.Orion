@@ -4,9 +4,9 @@ using Nalix.Common.Enums;
 using Nalix.Common.Packets;
 using Nalix.Common.Packets.Abstractions; // if IPacketTransformer is here
 using Nalix.Common.Serialization;
+using Nalix.Framework.Injection;
 using Nalix.Protocol.Enums;
 using Nalix.Protocol.Extensions;
-using Nalix.Framework.Injection;
 using Nalix.Shared.Extensions;
 using Nalix.Shared.Memory.Pooling;
 using Nalix.Shared.Messaging;
@@ -35,14 +35,14 @@ public sealed class CredsUpdatePacket : FrameBase, IPoolable, IPacketTransformer
     /// Old password (UTF-8, limited to 128 bytes).
     /// </summary>
     [SerializeDynamicSize(MaxPasswordBytes)]
-    [SerializeOrder(PacketHeaderOffset.DataRegion)]
+    [SerializeOrder(PacketHeaderOffset.DATA_REGION)]
     public System.String OldPassword { get; set; } = System.String.Empty;
 
     /// <summary>
     /// New password (UTF-8, limited to 128 bytes).
     /// </summary>
     [SerializeDynamicSize(MaxPasswordBytes)]
-    [SerializeOrder(PacketHeaderOffset.DataRegion + 1)]
+    [SerializeOrder(PacketHeaderOffset.DATA_REGION + 1)]
     public System.String NewPassword { get; set; } = System.String.Empty;
 
     /// <summary>
@@ -125,7 +125,7 @@ public sealed class CredsUpdatePacket : FrameBase, IPoolable, IPacketTransformer
         packet.OldPassword = packet.OldPassword.EncryptToBase64(key, algorithm);
         packet.NewPassword = packet.NewPassword.EncryptToBase64(key, algorithm);
 
-        packet.Flags |= PacketFlags.Encrypted;
+        packet.Flags |= PacketFlags.ENCRYPTED;
 
         return packet;
     }
@@ -143,7 +143,7 @@ public sealed class CredsUpdatePacket : FrameBase, IPoolable, IPacketTransformer
         {
             packet.OldPassword = packet.OldPassword.DecryptFromBase64(key);
             packet.NewPassword = packet.NewPassword.DecryptFromBase64(key);
-            packet.Flags &= ~PacketFlags.Encrypted;
+            packet.Flags &= ~PacketFlags.ENCRYPTED;
 
             return packet;
         }
@@ -166,7 +166,7 @@ public sealed class CredsUpdatePacket : FrameBase, IPoolable, IPacketTransformer
 
         packet.OldPassword = packet.OldPassword.CompressToBase64();
         packet.NewPassword = packet.NewPassword.CompressToBase64();
-        packet.Flags |= PacketFlags.Compressed;
+        packet.Flags |= PacketFlags.COMPRESSED;
 
         return packet;
     }
@@ -180,7 +180,7 @@ public sealed class CredsUpdatePacket : FrameBase, IPoolable, IPacketTransformer
 
         packet.OldPassword = packet.OldPassword.DecompressFromBase64();
         packet.NewPassword = packet.NewPassword.DecompressFromBase64();
-        packet.Flags &= ~PacketFlags.Compressed;
+        packet.Flags &= ~PacketFlags.COMPRESSED;
 
         return packet;
     }

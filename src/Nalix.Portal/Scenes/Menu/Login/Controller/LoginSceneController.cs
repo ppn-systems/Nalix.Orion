@@ -1,8 +1,8 @@
 ﻿using Nalix.Common.Protocols;
-using Nalix.Protocol.Enums;
 using Nalix.Portal.Scenes.Menu.Login.View;
 using Nalix.Portal.Scenes.Shared.Controller;
 using Nalix.Portal.Services.Abstractions;
+using Nalix.Protocol.Enums;
 
 namespace Nalix.Portal.Scenes.Menu.Login.Controller;
 
@@ -14,15 +14,15 @@ internal sealed class LoginSceneController(
 {
     protected override OpCommand Command => OpCommand.LOGIN;
 
-    protected override System.String MapErrorMessage(ProtocolCode code) => code switch
+    protected override System.String MapErrorMessage(ProtocolReason code) => code switch
     {
-        ProtocolCode.UNSUPPORTED_PACKET => "Client/server version mismatch.",
-        ProtocolCode.UNAUTHENTICATED => "Invalid username or password.",
-        ProtocolCode.ACCOUNT_LOCKED => "Too many failed attempts. Please wait and try again.",
-        ProtocolCode.ACCOUNT_SUSPENDED => "Your account is suspended.",
-        ProtocolCode.VALIDATION_FAILED => "Please fill both username and password.",
-        ProtocolCode.CANCELLED => "Login cancelled.",
-        ProtocolCode.INTERNAL_ERROR => "Server error. Please try again later.",
+        ProtocolReason.UNSUPPORTED_PACKET => "Client/server version mismatch.",
+        ProtocolReason.UNAUTHENTICATED => "Invalid username or password.",
+        ProtocolReason.ACCOUNT_LOCKED => "Too many failed attempts. Please wait and try again.",
+        ProtocolReason.ACCOUNT_SUSPENDED => "Your account is suspended.",
+        ProtocolReason.VALIDATION_FAILED => "Please fill both username and password.",
+        ProtocolReason.CANCELLED => "Login cancelled.",
+        ProtocolReason.INTERNAL_ERROR => "Server error. Please try again later.",
         _ => "Login failed."
     };
 }

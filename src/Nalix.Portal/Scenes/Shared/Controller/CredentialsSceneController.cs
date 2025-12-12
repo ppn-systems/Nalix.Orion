@@ -1,6 +1,6 @@
 ﻿using Nalix.Common.Protocols;
 using Nalix.Framework.Injection;
-using Nalix.Framework.Randomization;
+using Nalix.Framework.Random;
 using Nalix.Logging;
 using Nalix.Portal.Scenes.Menu.Main.View;
 using Nalix.Portal.Scenes.Shared.Model;
@@ -55,7 +55,7 @@ internal abstract class CredentialsSceneController<TView>
     protected abstract OpCommand Command { get; }
 
     /// <summary>Message mapping for errors (per scene).</summary>
-    protected abstract System.String MapErrorMessage(ProtocolCode code);
+    protected abstract System.String MapErrorMessage(ProtocolReason code);
 
     /// <summary>Scene to navigate when success.</summary>
     protected virtual System.String SuccessScene => SceneNames.Main;
@@ -203,11 +203,11 @@ internal abstract class CredentialsSceneController<TView>
                 await System.Threading.Tasks.Task.Delay(wait, _cts.Token).ConfigureAwait(false);
             }
 
-            if (ctrl.Action == ProtocolAction.DO_NOT_RETRY)
+            if (ctrl.Action == ProtocolAdvice.DO_NOT_RETRY)
             {
                 _view.LockUi(true);
             }
-            else if (ctrl.Action == ProtocolAction.REAUTHENTICATE)
+            else if (ctrl.Action == ProtocolAdvice.REAUTHENTICATE)
             {
                 _view.FocusPass();
             }
@@ -232,11 +232,11 @@ internal abstract class CredentialsSceneController<TView>
         }
     }
 
-    protected static System.TimeSpan? MapBackoff(ProtocolAction action) => action switch
+    protected static System.TimeSpan? MapBackoff(ProtocolAdvice action) => action switch
     {
-        ProtocolAction.BACKOFF_RETRY => System.TimeSpan.FromSeconds(3),
-        ProtocolAction.REAUTHENTICATE => System.TimeSpan.Zero,
-        ProtocolAction.DO_NOT_RETRY => null,
+        ProtocolAdvice.BACKOFF_RETRY => System.TimeSpan.FromSeconds(3),
+        ProtocolAdvice.REAUTHENTICATE => System.TimeSpan.Zero,
+        ProtocolAdvice.DO_NOT_RETRY => null,
         _ => null
     };
 

@@ -7,10 +7,10 @@ using Nalix.Common.Packets.Abstractions;
 using Nalix.Common.Packets.Attributes;
 using Nalix.Common.Protocols;
 using Nalix.Framework.Injection;
-using Nalix.Framework.Randomization;                   // <-- ControlType / ProtocolCode / ProtocolAction / ControlFlags
+using Nalix.Framework.Random;
 using Nalix.Infrastructure.Repositories;
 using Nalix.Logging;
-using Nalix.Network.Connection;                 // <-- for ConnectionExtensions.SendAsync(..)
+using Nalix.Network.Connections;
 using Nalix.Protocol.Collections;
 using Nalix.Protocol.Enums;
 using Nalix.Protocol.Models;
@@ -46,7 +46,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
     [PacketTimeout(4000)]
     [PacketEncryption(true)]
     [PacketRateLimit(1, 01)]
-    [PacketPermission(PermissionLevel.Guest)]
+    [PacketPermission(PermissionLevel.GUEST)]
     [PacketOpcode((System.UInt16)OpCommand.REGISTER)]
     [System.Runtime.CompilerServices.MethodImpl(
         System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -59,7 +59,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
 
         if (p is not CredentialsPacket packet)
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.UNSUPPORTED_PACKET, ProtocolAction.DO_NOT_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.UNSUPPORTED_PACKET, ProtocolAdvice.DO_NOT_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Invalid packet type. Expected CredentialsPacket from {0}", connection.RemoteEndPoint);
@@ -69,7 +69,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
 
         if (packet.Credentials is null)
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.VALIDATION_FAILED, ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.VALIDATION_FAILED, ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Null credentials in register packet from {0}", connection.RemoteEndPoint);
@@ -84,8 +84,8 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
             await SendErrorAsync(
                     connection,
                     seq,
-                    ProtocolCode.INVALID_USERNAME,
-                    ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+                    ProtocolReason.INVALID_USERNAME,
+                    ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Invalid username format '{0}' in register attempt from {1}", credentials.Username, connection.RemoteEndPoint);
@@ -98,8 +98,8 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
             await SendErrorAsync(
                     connection,
                     seq,
-                    ProtocolCode.WEAK_PASSWORD,
-                    ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+                    ProtocolReason.WEAK_PASSWORD,
+                    ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Weak password in register attempt from {0}", connection.RemoteEndPoint);
@@ -117,7 +117,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
                 Username = credentials.Username,
                 Salt = salt,
                 Hash = hash,
-                Role = PermissionLevel.User,
+                Role = PermissionLevel.USER,
                 CreatedAt = System.DateTime.UtcNow,
                 IsActive = true,
                 FailedLoginCount = 0
@@ -131,7 +131,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
 
             if (id <= 0)
             {
-                await SendErrorAsync(connection, seq, ProtocolCode.ALREADY_EXISTS, ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+                await SendErrorAsync(connection, seq, ProtocolReason.ALREADY_EXISTS, ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
 
                 NLogix.Host.Instance.Debug(
                     "Username {0} already exists from connection {1}", credentials.Username, connection.RemoteEndPoint);
@@ -148,8 +148,8 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
         {
             await SendErrorAsync(
                 connection, seq,
-                ProtocolCode.INTERNAL_ERROR,
-                ProtocolAction.BACKOFF_RETRY,
+                ProtocolReason.INTERNAL_ERROR,
+                ProtocolAdvice.BACKOFF_RETRY,
                 flags: ControlFlags.IS_TRANSIENT).ConfigureAwait(false);
 
             NLogix.Host.Instance.Error(
@@ -163,7 +163,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
     [PacketTimeout(4000)]
     [PacketEncryption(true)]
     [PacketRateLimit(2, 03)]
-    [PacketPermission(PermissionLevel.Guest)]
+    [PacketPermission(PermissionLevel.GUEST)]
     [PacketOpcode((System.UInt16)OpCommand.LOGIN)]
     [System.Runtime.CompilerServices.MethodImpl(
         System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -176,7 +176,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
 
         if (p is not CredentialsPacket packet)
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.UNSUPPORTED_PACKET, ProtocolAction.DO_NOT_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.UNSUPPORTED_PACKET, ProtocolAdvice.DO_NOT_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Invalid packet type. Expected CredentialsPacket from {0}", connection.RemoteEndPoint);
@@ -186,7 +186,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
 
         if (packet.Credentials is null)
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.VALIDATION_FAILED, ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.VALIDATION_FAILED, ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Null credentials in login packet from {0}", connection.RemoteEndPoint);
@@ -197,7 +197,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
         if (System.String.IsNullOrWhiteSpace(packet.Credentials.Username) ||
             System.String.IsNullOrWhiteSpace(packet.Credentials.Password))
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.VALIDATION_FAILED, ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.VALIDATION_FAILED, ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Empty username or password in login attempt from {0}", connection.RemoteEndPoint);
@@ -219,8 +219,8 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
 
                 await SendErrorAsync(
                     connection, seq,
-                    ProtocolCode.UNAUTHENTICATED,
-                    ProtocolAction.REAUTHENTICATE,
+                    ProtocolReason.UNAUTHENTICATED,
+                    ProtocolAdvice.REAUTHENTICATE,
                     flags: ControlFlags.IS_AUTH_RELATED).ConfigureAwait(false);
 
                 NLogix.Host.Instance.Debug(
@@ -238,8 +238,8 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
             {
                 await SendErrorAsync(
                     connection, seq,
-                    ProtocolCode.ACCOUNT_LOCKED,
-                    ProtocolAction.BACKOFF_RETRY,
+                    ProtocolReason.ACCOUNT_LOCKED,
+                    ProtocolAdvice.BACKOFF_RETRY,
                     flags: ControlFlags.IS_AUTH_RELATED).ConfigureAwait(false);
 
                 NLogix.Host.Instance.Debug(
@@ -258,8 +258,8 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
                 _ = await _accounts.IncrementFailedAsync(id, System.DateTime.UtcNow, token).ConfigureAwait(false);
                 await SendErrorAsync(
                     connection, seq,
-                    ProtocolCode.UNAUTHENTICATED,
-                    ProtocolAction.REAUTHENTICATE,
+                    ProtocolReason.UNAUTHENTICATED,
+                    ProtocolAdvice.REAUTHENTICATE,
                     flags: ControlFlags.IS_AUTH_RELATED).ConfigureAwait(false);
 
                 NLogix.Host.Instance.Debug(
@@ -273,8 +273,8 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
             {
                 await SendErrorAsync(
                     connection, seq,
-                    ProtocolCode.ACCOUNT_SUSPENDED,
-                    ProtocolAction.DO_NOT_RETRY,
+                    ProtocolReason.ACCOUNT_SUSPENDED,
+                    ProtocolAdvice.DO_NOT_RETRY,
                     flags: ControlFlags.IS_AUTH_RELATED).ConfigureAwait(false);
 
                 NLogix.Host.Instance.Debug(
@@ -300,8 +300,8 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
         {
             await SendErrorAsync(
                 connection, seq,
-                ProtocolCode.CANCELLED,
-                ProtocolAction.DO_NOT_RETRY,
+                ProtocolReason.CANCELLED,
+                ProtocolAdvice.DO_NOT_RETRY,
                 flags: ControlFlags.IS_TRANSIENT).ConfigureAwait(false);
 
             NLogix.Host.Instance.Warn(
@@ -311,8 +311,8 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
         {
             await SendErrorAsync(
                 connection, seq,
-                ProtocolCode.INTERNAL_ERROR,
-                ProtocolAction.BACKOFF_RETRY,
+                ProtocolReason.INTERNAL_ERROR,
+                ProtocolAdvice.BACKOFF_RETRY,
                 flags: ControlFlags.IS_TRANSIENT).ConfigureAwait(false);
 
             NLogix.Host.Instance.Error(
@@ -324,7 +324,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
     /// Handles user logout.
     /// </summary>
     [PacketEncryption(false)]
-    [PacketPermission(PermissionLevel.User)]
+    [PacketPermission(PermissionLevel.USER)]
     [PacketOpcode((System.UInt16)OpCommand.LOGOUT)]
     [System.Runtime.CompilerServices.MethodImpl(
         System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -341,7 +341,7 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
 
         if (username is null)
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.SESSION_NOT_FOUND, ProtocolAction.DO_NOT_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.SESSION_NOT_FOUND, ProtocolAdvice.DO_NOT_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Warn(
                 "LOGOUT attempt without valid session from connection {0}", connection.RemoteEndPoint);
@@ -354,15 +354,15 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
             _ = await _accounts.StampLogoutAsync(username, System.DateTime.UtcNow, token).ConfigureAwait(false);
 
             // Reset connection state
-            connection.Level = PermissionLevel.None;
+            connection.Level = PermissionLevel.NONE;
             _ = InstanceManager.Instance.GetOrCreateInstance<ConnectionHub>()
                                         .UnregisterConnection(connection);
 
             // Inform client to close (correlated), then disconnect so client receives it
             await connection.SendAsync(
                 ControlType.DISCONNECT,
-                ProtocolCode.CLIENT_QUIT,
-                ProtocolAction.NONE,
+                ProtocolReason.CLIENT_QUIT,
+                ProtocolAdvice.NONE,
                 sequenceId: seq).ConfigureAwait(false);
 
             connection.Disconnect();
@@ -375,12 +375,12 @@ public sealed class AccountOps(CredentialsRepository accounts) : OpsBase
             // Best-effort error report then drop
             await SendErrorAsync(
                     connection, seq,
-                    ProtocolCode.INTERNAL_ERROR,
-                    ProtocolAction.BACKOFF_RETRY,
+                    ProtocolReason.INTERNAL_ERROR,
+                    ProtocolAdvice.BACKOFF_RETRY,
                     flags: ControlFlags.IS_TRANSIENT)
                 .ConfigureAwait(false);
 
-            connection.Level = PermissionLevel.None;
+            connection.Level = PermissionLevel.NONE;
             connection.Disconnect();
 
             NLogix.Host.Instance.Error(

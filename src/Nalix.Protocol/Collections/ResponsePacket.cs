@@ -3,9 +3,9 @@ using Nalix.Common.Caching;
 using Nalix.Common.Packets;
 using Nalix.Common.Packets.Abstractions;
 using Nalix.Common.Serialization;
+using Nalix.Framework.Injection;
 using Nalix.Protocol.Enums;
 using Nalix.Protocol.Extensions;
-using Nalix.Framework.Injection;
 using Nalix.Shared.Memory.Pooling;
 using Nalix.Shared.Messaging;
 using Nalix.Shared.Serialization;
@@ -24,7 +24,7 @@ public sealed class ResponsePacket : FrameBase, IPoolable, IPacketDeserializer<R
     /// Trạng thái phản hồi (Ok, InvalidCredentials, Locked…).
     /// Được serialize thành 1 byte.
     /// </summary>
-    [SerializeOrder(PacketHeaderOffset.DataRegion)]
+    [SerializeOrder(PacketHeaderOffset.DATA_REGION)]
     public ResponseStatus Status { get; set; }
 
     /// <summary>

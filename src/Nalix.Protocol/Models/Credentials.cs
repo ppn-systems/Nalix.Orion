@@ -80,7 +80,7 @@ public sealed class Credentials
     /// </summary>
     [Column("Role")]
     [Required]
-    public PermissionLevel Role { get; set; } = PermissionLevel.User;
+    public PermissionLevel Role { get; set; } = PermissionLevel.USER;
 
     /// <summary>
     /// Số lần đăng nhập thất bại liên tiếp.

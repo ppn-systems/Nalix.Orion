@@ -7,9 +7,9 @@ using Nalix.Common.Packets.Abstractions;
 using Nalix.Common.Packets.Attributes;
 using Nalix.Common.Protocols;
 using Nalix.Framework.Injection;
-using Nalix.Infrastructure.Repositories;            // ControlType, ProtocolCode, ProtocolAction, ControlFlags
+using Nalix.Infrastructure.Repositories;            // ControlType, ProtocolReason, ProtocolAction, ControlFlags
 using Nalix.Logging;
-using Nalix.Network.Connection;          // ConnectionExtensions.SendAsync
+using Nalix.Network.Connections;          // ConnectionExtensions.SendAsync
 using Nalix.Protocol.Collections;
 using Nalix.Protocol.Enums;
 using Nalix.Shared.Security.Credentials;
@@ -34,7 +34,7 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
     /// - Clear sensitive buffers
     /// </summary>
     [PacketEncryption(true)]
-    [PacketPermission(PermissionLevel.User)]
+    [PacketPermission(PermissionLevel.USER)]
     [PacketOpcode((System.UInt16)OpCommand.CHANGE_PASSWORD)]
     [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public async System.Threading.Tasks.Task ChangePasswordAsync(IPacket p, IConnection connection)
@@ -44,7 +44,7 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
 
         if (p is not CredsUpdatePacket packet)
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.UNSUPPORTED_PACKET, ProtocolAction.DO_NOT_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.UNSUPPORTED_PACKET, ProtocolAdvice.DO_NOT_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Invalid packet type. Expected CredsUpdatePacket from {0}", connection.RemoteEndPoint);
@@ -58,7 +58,7 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
 
         if (username is null)
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.SESSION_NOT_FOUND, ProtocolAction.DO_NOT_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.SESSION_NOT_FOUND, ProtocolAdvice.DO_NOT_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "CHANGE_PASSWORD attempt without valid session from {0}", connection.RemoteEndPoint);
@@ -68,7 +68,7 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
 
         if (packet.OldPassword is null || packet.NewPassword is null)
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.VALIDATION_FAILED, ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.VALIDATION_FAILED, ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
 
             NLogix.Host.Instance.Debug(
                 "Null payload in CHANGE_PASSWORD from {0}", connection.RemoteEndPoint);
@@ -79,7 +79,7 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
         // Check new password strength
         if (!CredentialPolicy.IsStrongPassword(packet.NewPassword))
         {
-            await SendErrorAsync(connection, seq, ProtocolCode.VALIDATION_FAILED, ProtocolAction.FIX_AND_RETRY).ConfigureAwait(false);
+            await SendErrorAsync(connection, seq, ProtocolReason.VALIDATION_FAILED, ProtocolAdvice.FIX_AND_RETRY).ConfigureAwait(false);
             return;
         }
 
@@ -90,7 +90,7 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
 
             if (auth is null)
             {
-                await SendErrorAsync(connection, seq, ProtocolCode.SESSION_NOT_FOUND, ProtocolAction.DO_NOT_RETRY).ConfigureAwait(false);
+                await SendErrorAsync(connection, seq, ProtocolReason.SESSION_NOT_FOUND, ProtocolAdvice.DO_NOT_RETRY).ConfigureAwait(false);
                 return;
             }
 
@@ -100,8 +100,8 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
             {
                 await SendErrorAsync(
                     connection, seq,
-                    ProtocolCode.ACCOUNT_SUSPENDED,
-                    ProtocolAction.DO_NOT_RETRY,
+                    ProtocolReason.ACCOUNT_SUSPENDED,
+                    ProtocolAdvice.DO_NOT_RETRY,
                     flags: ControlFlags.IS_AUTH_RELATED).ConfigureAwait(false);
 
                 NLogix.Host.Instance.Debug(
@@ -115,8 +115,8 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
             {
                 await SendErrorAsync(
                         connection, seq,
-                        ProtocolCode.UNAUTHENTICATED,
-                        ProtocolAction.REAUTHENTICATE,
+                        ProtocolReason.UNAUTHENTICATED,
+                        ProtocolAdvice.REAUTHENTICATE,
                         flags: ControlFlags.IS_AUTH_RELATED).ConfigureAwait(false);
 
                 NLogix.Host.Instance.Debug(
@@ -142,8 +142,8 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
             {
                 await SendErrorAsync(
                         connection, seq,
-                        ProtocolCode.VALIDATION_FAILED,
-                        ProtocolAction.BACKOFF_RETRY,
+                        ProtocolReason.VALIDATION_FAILED,
+                        ProtocolAdvice.BACKOFF_RETRY,
                         flags: ControlFlags.IS_TRANSIENT).ConfigureAwait(false);
 
                 NLogix.Host.Instance.Debug(
@@ -161,8 +161,8 @@ public sealed class PasswordOps(CredentialsRepository accounts) : OpsBase
         {
             await SendErrorAsync(
                 connection, seq,
-                ProtocolCode.INTERNAL_ERROR,
-                ProtocolAction.BACKOFF_RETRY,
+                ProtocolReason.INTERNAL_ERROR,
+                ProtocolAdvice.BACKOFF_RETRY,
                 flags: ControlFlags.IS_TRANSIENT).ConfigureAwait(false);
 
             NLogix.Host.Instance.Error(

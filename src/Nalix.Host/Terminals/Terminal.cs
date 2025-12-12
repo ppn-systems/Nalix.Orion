@@ -7,7 +7,7 @@ using Nalix.Host.Runtime;
 using Nalix.Infrastructure.Network;
 using Nalix.Logging;
 using Nalix.Logging.Interop;
-using Nalix.Network.Connection;
+using Nalix.Network.Connections;
 using Nalix.Network.Throttling;
 using Nalix.Shared.Memory.Pooling;
 

@@ -3,7 +3,7 @@
 using Nalix.Common.Connection;
 using Nalix.Common.Packets.Abstractions;
 using Nalix.Common.Protocols;
-using Nalix.Network.Connection;
+using Nalix.Network.Connections;
 
 namespace Nalix.Application.Operations;
 
@@ -24,7 +24,7 @@ public abstract class OpsBase
     /// Sends an ACK directive correlated with the given sequence.
     /// </summary>
     protected static System.Threading.Tasks.Task SendAckAsync(IConnection c, System.UInt32 seq)
-        => c.SendAsync(ControlType.ACK, ProtocolCode.NONE, ProtocolAction.NONE, sequenceId: seq);
+        => c.SendAsync(ControlType.ACK, ProtocolReason.NONE, ProtocolAdvice.NONE, sequenceId: seq);
 
     /// <summary>
     /// Sends an ERROR directive with code, action, and optional flags.
@@ -32,8 +32,8 @@ public abstract class OpsBase
     protected static System.Threading.Tasks.Task SendErrorAsync(
         IConnection c,
         System.UInt32 seq,
-        ProtocolCode code,
-        ProtocolAction action,
+        ProtocolReason code,
+        ProtocolAdvice action,
         ControlFlags flags = ControlFlags.NONE)
         => c.SendAsync(ControlType.ERROR, code, action, sequenceId: seq, flags: flags);
 }

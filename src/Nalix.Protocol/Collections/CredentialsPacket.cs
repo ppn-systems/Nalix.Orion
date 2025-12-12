@@ -4,10 +4,10 @@ using Nalix.Common.Enums;
 using Nalix.Common.Packets;
 using Nalix.Common.Packets.Abstractions;
 using Nalix.Common.Serialization;
+using Nalix.Framework.Injection;
 using Nalix.Protocol.Enums;
 using Nalix.Protocol.Extensions;
 using Nalix.Protocol.Models;
-using Nalix.Framework.Injection;
 using Nalix.Shared.Extensions;
 using Nalix.Shared.Memory.Pooling;
 using Nalix.Shared.Messaging;
@@ -30,13 +30,13 @@ public class CredentialsPacket : FrameBase, IPoolable, IPacketTransformer<Creden
     public override System.UInt16 Length =>
         (System.UInt16)(PacketConstants.HeaderSize + Credentials.EstimatedSerializedLength());
 
-    [SerializeOrder(PacketHeaderOffset.DataRegion)]
+    [SerializeOrder(PacketHeaderOffset.DATA_REGION)]
     public System.UInt32 SequenceId { get; set; }
 
     /// <summary>
     /// Thông tin đăng nhập (username, mật khẩu băm, metadata).
     /// </summary>
-    [SerializeOrder(PacketHeaderOffset.DataRegion + 1)]
+    [SerializeOrder(PacketHeaderOffset.DATA_REGION + 1)]
     public Credentials Credentials { get; set; }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class CredentialsPacket : FrameBase, IPoolable, IPacketTransformer<Creden
         packet.Credentials.Username = packet.Credentials.Username.EncryptToBase64(key, algorithm);
         packet.Credentials.Password = packet.Credentials.Password.EncryptToBase64(key, algorithm);
 
-        packet.Flags |= PacketFlags.Encrypted;
+        packet.Flags |= PacketFlags.ENCRYPTED;
 
         return packet;
     }
@@ -99,7 +99,7 @@ public class CredentialsPacket : FrameBase, IPoolable, IPacketTransformer<Creden
             packet.Credentials.Username = packet.Credentials.Username.DecryptFromBase64(key);
             packet.Credentials.Password = packet.Credentials.Password.DecryptFromBase64(key);
 
-            packet.Flags &= ~PacketFlags.Encrypted;
+            packet.Flags &= ~PacketFlags.ENCRYPTED;
 
             return packet;
         }
@@ -123,7 +123,7 @@ public class CredentialsPacket : FrameBase, IPoolable, IPacketTransformer<Creden
         packet.Credentials.Username = packet.Credentials.Username.CompressToBase64();
         packet.Credentials.Password = packet.Credentials.Password.CompressToBase64();
 
-        packet.Flags |= PacketFlags.Compressed;
+        packet.Flags |= PacketFlags.COMPRESSED;
 
         return packet;
     }
@@ -138,7 +138,7 @@ public class CredentialsPacket : FrameBase, IPoolable, IPacketTransformer<Creden
         packet.Credentials.Username = packet.Credentials.Username.DecompressFromBase64();
         packet.Credentials.Password = packet.Credentials.Password.DecompressFromBase64();
 
-        packet.Flags &= ~PacketFlags.Compressed;
+        packet.Flags &= ~PacketFlags.COMPRESSED;
 
         return packet;
     }
