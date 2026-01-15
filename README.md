@@ -2,12 +2,9 @@
 
 ![.NET](https://img.shields.io/badge/.NET-10.0-blueviolet?logo=dotnet&logoColor=white)
 
-![GitHub License](https://img.shields.io/github/license//ppn-systems/Nalix?style=flat-square)
-
 ![Issues](https://img.shields.io/github/issues/ppn-systems/Nalix.Orion)
 ![PRs](https://img.shields.io/github/issues-pr/ppn-systems/Nalix.Orion)
 ![GitHub file size in bytes](https://img.shields.io/github/repo-size/ppn-systems/Nalix.Orion)
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m//ppn-systems/Nalix.Orion?style=flat-square&logo=github)
 
 Nalix.Orion is a 2D game project designed for both server and client sides, built using modern .NET technologies. It leverages custom libraries from the Nalix ecosystem (developed in-house), along with other powerful tools such as Entity Framework (EF) for data access and SFML for rendering and multimedia.
 
