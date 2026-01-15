@@ -1,8 +1,8 @@
-﻿using Nalix.Common.Logging;
-using Nalix.Common.Packets.Abstractions;
-using Nalix.Protocol.Collections;
+﻿using Nalix.Common.Diagnostics;
+using Nalix.Common.Messaging.Packets.Abstractions;
 using Nalix.Framework.Injection;
 using Nalix.Logging;
+using Nalix.Protocol.Collections;
 using Nalix.Shared.Messaging.Catalog;
 
 namespace Nalix.Protocol;

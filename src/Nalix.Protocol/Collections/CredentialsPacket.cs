@@ -1,8 +1,8 @@
-﻿using Nalix.Common.Attributes;
-using Nalix.Common.Caching;
-using Nalix.Common.Enums;
-using Nalix.Common.Packets;
-using Nalix.Common.Packets.Abstractions;
+﻿using Nalix.Common.Core.Attributes;
+using Nalix.Common.Core.Enums;
+using Nalix.Common.Infrastructure.Caching;
+using Nalix.Common.Messaging.Packets;
+using Nalix.Common.Messaging.Packets.Abstractions;
 using Nalix.Common.Serialization;
 using Nalix.Framework.Injection;
 using Nalix.Protocol.Enums;

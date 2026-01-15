@@ -1,4 +1,4 @@
-﻿using Nalix.Common.Enums;
+﻿using Nalix.Common.Core.Enums;
 using Nalix.Common.Serialization;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
