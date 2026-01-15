@@ -1,12 +1,11 @@
 ﻿// Copyright (c) 2025 PPN Corporation. All rights reserved.
 
-using Nalix.Common.Abstractions;
+using Nalix.Common.Core.Abstractions;
 using Nalix.Framework.Injection;
 using Nalix.Framework.Tasks;
 using Nalix.Host.Runtime;
 using Nalix.Infrastructure.Network;
 using Nalix.Logging;
-using Nalix.Logging.Interop;
 using Nalix.Network.Connections;
 using Nalix.Network.Throttling;
 using Nalix.Shared.Memory.Pooling;
@@ -181,31 +180,24 @@ internal sealed class TerminalService(IConsoleReader reader, ShortcutManager sho
         NLogix.Host.Instance.Info(sb.ToString());
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
     private void SHOW_REPORT()
     {
-        using TransientConsoleScope _scope = new("Report");
-        using (TransientConsoleScope.Shared())
-        {
-            TransientConsoleScope.WriteLine("Generating report...");
-            TransientConsoleScope.WriteLine("\n-------------------------------------------------------------\n");
-            TransientConsoleScope.WriteLine(InstanceManager.Instance.GenerateReport());
-            TransientConsoleScope.WriteLine("\n-------------------------------------------------------------\n");
-            TransientConsoleScope.WriteLine(InstanceManager.Instance.GetOrCreateInstance<TaskManager>().GenerateReport());
-            TransientConsoleScope.WriteLine("\n-------------------------------------------------------------\n");
-            TransientConsoleScope.WriteLine(InstanceManager.Instance.GetOrCreateInstance<BufferPoolManager>().GenerateReport());
-            TransientConsoleScope.WriteLine("\n-------------------------------------------------------------\n");
-            TransientConsoleScope.WriteLine(InstanceManager.Instance.GetOrCreateInstance<ObjectPoolManager>().GenerateReport());
-            TransientConsoleScope.WriteLine("\n-------------------------------------------------------------\n");
-            TransientConsoleScope.WriteLine(InstanceManager.Instance.GetOrCreateInstance<ConnectionHub>().GenerateReport());
-            TransientConsoleScope.WriteLine("\n-------------------------------------------------------------\n");
-            TransientConsoleScope.WriteLine(InstanceManager.Instance.GetOrCreateInstance<ConnectionLimiter>().GenerateReport());
-            TransientConsoleScope.WriteLine("\n-------------------------------------------------------------\n");
-            TransientConsoleScope.WriteLine(InstanceManager.Instance.GetOrCreateInstance<TokenBucketLimiter>().GenerateReport());
-            TransientConsoleScope.WriteLine("\n-------------------------------------------------------------\n");
-
-            TransientConsoleScope.ReadKey();
-        }
+        System.Console.WriteLine("Generating report...");
+        System.Console.WriteLine("\n-------------------------------------------------------------\n");
+        System.Console.WriteLine(InstanceManager.Instance.GenerateReport());
+        System.Console.WriteLine("\n-------------------------------------------------------------\n");
+        System.Console.WriteLine(InstanceManager.Instance.GetOrCreateInstance<TaskManager>().GenerateReport());
+        System.Console.WriteLine("\n-------------------------------------------------------------\n");
+        System.Console.WriteLine(InstanceManager.Instance.GetOrCreateInstance<BufferPoolManager>().GenerateReport());
+        System.Console.WriteLine("\n-------------------------------------------------------------\n");
+        System.Console.WriteLine(InstanceManager.Instance.GetOrCreateInstance<ObjectPoolManager>().GenerateReport());
+        System.Console.WriteLine("\n-------------------------------------------------------------\n");
+        System.Console.WriteLine(InstanceManager.Instance.GetOrCreateInstance<ConnectionHub>().GenerateReport());
+        System.Console.WriteLine("\n-------------------------------------------------------------\n");
+        System.Console.WriteLine(InstanceManager.Instance.GetOrCreateInstance<ConnectionLimiter>().GenerateReport());
+        System.Console.WriteLine("\n-------------------------------------------------------------\n");
+        System.Console.WriteLine(InstanceManager.Instance.GetOrCreateInstance<TokenBucketLimiter>().GenerateReport());
+        System.Console.WriteLine("\n-------------------------------------------------------------\n");
     }
 
     private static System.String FORMAT_MODIFIERS(System.ConsoleModifiers mod)

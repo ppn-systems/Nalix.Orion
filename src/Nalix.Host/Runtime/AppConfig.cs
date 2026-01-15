@@ -1,8 +1,7 @@
 ﻿// Copyright (c) 2025 PPN Corporation. All rights reserved.
 
 using Nalix.Application.Operations.Security;
-using Nalix.Common.Logging;
-using Nalix.Protocol;
+using Nalix.Common.Diagnostics;
 using Nalix.Framework.Injection;
 using Nalix.Host.Assemblies;
 using Nalix.Infrastructure.Database;
@@ -12,6 +11,7 @@ using Nalix.Logging;
 using Nalix.Network.Dispatch;
 using Nalix.Network.Middleware.Inbound;
 using Nalix.Network.Middleware.Outbound;
+using Nalix.Protocol;
 
 namespace Nalix.Host.Runtime;
 
