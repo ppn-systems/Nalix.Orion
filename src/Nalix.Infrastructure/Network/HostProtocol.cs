@@ -1,5 +1,6 @@
 ﻿using Nalix.Common.Connection;
-using Nalix.Common.Packets.Abstractions;
+using Nalix.Common.Infrastructure.Connection;
+using Nalix.Common.Messaging.Packets.Abstractions;
 using Nalix.Framework.Injection;
 using Nalix.Logging;
 using Nalix.Network.Abstractions;
