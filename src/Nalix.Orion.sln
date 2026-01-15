@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11205.157 d18.0
+VisualStudioVersion = 18.0.11205.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nalix.Portal", "Nalix.Portal\Nalix.Portal.csproj", "{DF3C2997-BCA2-4030-809B-EBCB68F171A1}"
 EndProject
@@ -16,8 +16,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nalix.Protocol", "Nalix.Protocol\Nalix.Protocol.csproj", "{99E5F3A6-0998-4C57-980B-621312EA7673}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nalix.Rendering", "Nalix.Rendering\Nalix.Rendering.csproj", "{00090124-37B7-4818-E37A-7F72DAE3DB29}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nalix.Mono", "Nalix.Mono\Nalix.Mono.csproj", "{72B5D00B-EAAF-4C63-A171-FBA50D17005A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +51,6 @@ Global
 		{00090124-37B7-4818-E37A-7F72DAE3DB29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00090124-37B7-4818-E37A-7F72DAE3DB29}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00090124-37B7-4818-E37A-7F72DAE3DB29}.Release|Any CPU.Build.0 = Release|Any CPU
-		{72B5D00B-EAAF-4C63-A171-FBA50D17005A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{72B5D00B-EAAF-4C63-A171-FBA50D17005A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{72B5D00B-EAAF-4C63-A171-FBA50D17005A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{72B5D00B-EAAF-4C63-A171-FBA50D17005A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
