@@ -1,5 +1,6 @@
 ﻿// Copyright (c) 2025 PPN Corporation. All rights reserved.
 
+using Nalix.Common.Diagnostics;
 using Nalix.Framework.Injection;
 using Nalix.Portal.Enums;
 using Nalix.Portal.Objects.Indicators;
@@ -180,7 +181,7 @@ public class NetworkScene : Scene
             }
             catch (System.Exception ex)
             {
-                InstanceManager.Instance.GetExistingInstance<Common.Logging.ILogger>()?
+                InstanceManager.Instance.GetExistingInstance<ILogger>()?
                                         .Error("Failed to resolve ReliableClient for connection attempt", ex);
 
                 _connectTask = System.Threading.Tasks.Task.FromException(new System.Exception("Dependency resolution failed"));

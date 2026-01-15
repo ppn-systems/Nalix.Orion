@@ -1,4 +1,4 @@
-﻿using Nalix.Common.Protocols;
+﻿using Nalix.Common.Messaging.Protocols;
 using Nalix.Framework.Injection;
 using Nalix.Framework.Random;
 using Nalix.Logging;

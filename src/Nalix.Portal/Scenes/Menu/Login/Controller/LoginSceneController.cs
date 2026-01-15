@@ -1,4 +1,4 @@
-﻿using Nalix.Common.Protocols;
+﻿using Nalix.Common.Messaging.Protocols;
 using Nalix.Portal.Scenes.Menu.Login.View;
 using Nalix.Portal.Scenes.Shared.Controller;
 using Nalix.Portal.Services.Abstractions;
