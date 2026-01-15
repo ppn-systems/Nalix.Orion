@@ -1,8 +1,8 @@
 ﻿using Nalix.Common.Connection;
-using Nalix.Common.Enums;
-using Nalix.Common.Packets.Abstractions;
-using Nalix.Common.Packets.Attributes;
-using Nalix.Common.Protocols;
+using Nalix.Common.Core.Enums;
+using Nalix.Common.Messaging.Packets.Abstractions;
+using Nalix.Common.Messaging.Packets.Attributes;
+using Nalix.Common.Messaging.Protocols;
 using Nalix.Framework.Injection;
 using Nalix.Logging;
 using Nalix.Network.Connections;
